@@ -1,2 +1,2 @@
 # ACADNETTraining
-AutoCAD .NET plugin  development training
+AutoCAD .NET plugin development training
