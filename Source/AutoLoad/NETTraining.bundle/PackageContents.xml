@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ApplicationPackage SchemaVersion="1.0"
+                    AutodeskProduct="AutoCAD"
+                    ProductType="Application"
+                    Name="NETTraining">
+  <CompanyDetails Name="NETTraining Team" Phone="" Url="" Email="" />
+  <RuntimeRequirements SeriesMax="R20.1"
+                       SeriesMin="R20.1"
+                       Platform="AutoCAD"
+                       OS="Win32|Win64" />
+  <Components>
+    <RuntimeRequirements OS="Win64" Platform="AutoCAD" SeriesMin="R20.1" SeriesMax="R20.1" />
+    <ComponentEntry AppName="Lesson1" ModuleNameWin64="./Contents/Win64/Lesson1.dll" AppDescription="Extensions to AutoCAD" LoadOnAutoCADStartup="True"></ComponentEntry>
+  </Components>
+</ApplicationPackage>
