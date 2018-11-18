@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using System;
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 [assembly: CommandClass(typeof(ACADPlugin.TestCmd))]
 
@@ -12,7 +13,7 @@ namespace ACADPlugin
         [CommandMethod("AssociateEntities")]
         public void cmdAssociateEntities()
         {
-            var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
             var ed = doc.Editor;
             var db = doc.Database;
 
@@ -35,7 +36,7 @@ namespace ACADPlugin
         private ObjectId circle2Id = ObjectId.Null;
         void circle1_Modified(object sender, EventArgs e)
         {
-            var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
             var ed = doc.Editor;
             var db = doc.Database;
 

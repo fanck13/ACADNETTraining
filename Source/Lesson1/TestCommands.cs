@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Runtime;
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 [assembly: CommandClass(typeof(ACADPlugin.TestCmd))]
 
@@ -10,7 +11,7 @@ namespace ACADPlugin
         [CommandMethod("helloworld")]
         public void cmdHelloWorld()
         {
-            Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("Hello World!");
+            AcApp.DocumentManager.MdiActiveDocument.Editor.WriteMessage("Hello World!");
         }
     }
 }

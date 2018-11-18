@@ -1,13 +1,9 @@
-﻿using System.Reflection;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using System.Collections.Generic;
+using Autodesk.AutoCAD.Runtime;
 using System;
 using System.Linq;
-using Autodesk.AutoCAD.Geometry;
-using System.Drawing;
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 [assembly: CommandClass(typeof(ACADPlugin.TestCmd))]
 
@@ -18,7 +14,7 @@ namespace ACADPlugin
         [CommandMethod("GetObjectIdWithPrompt")]
         public void cmdGetObjectIdWithPrompt()
         {
-            var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
             var ed = doc.Editor;
             var db = doc.Database;
 
@@ -31,7 +27,7 @@ namespace ACADPlugin
         [CommandMethod("GetObjectIdFromHandle")]
         public void cmdGetObjectIdFromHandle()
         {
-            var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
             var ed = doc.Editor;
             var db = doc.Database;
 
@@ -47,7 +43,7 @@ namespace ACADPlugin
         [CommandMethod("GetObjectIdFromBlockTable")]
         public void cmdGetObjectIdFromBlockTable()
         {
-            var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
             var ed = doc.Editor;
             var db = doc.Database;
 

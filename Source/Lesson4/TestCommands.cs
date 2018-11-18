@@ -1,13 +1,9 @@
-﻿using System.Reflection;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using System.Collections.Generic;
-using System;
-using System.Linq;
 using Autodesk.AutoCAD.Geometry;
-using System.Drawing;
+using Autodesk.AutoCAD.Runtime;
+using System;
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 [assembly: CommandClass(typeof(ACADPlugin.TestCmd))]
 
@@ -18,7 +14,7 @@ namespace ACADPlugin
         [CommandMethod("CreateCircle")]
         public void cmdCreateCircle()
         {
-            var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
             var ed = doc.Editor;
             var db = doc.Database;
 
@@ -46,7 +42,7 @@ namespace ACADPlugin
         [CommandMethod("DeleteEntity")]
         public void cmdDeleteEntity()
         {
-            var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
             var ed = doc.Editor;
             var db = doc.Database;
 
@@ -65,7 +61,7 @@ namespace ACADPlugin
         [CommandMethod("ModifyCircle")]
         public void cmdModifyCircle()
         {
-            var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
             var ed = doc.Editor;
             var db = doc.Database;
 
@@ -87,7 +83,7 @@ namespace ACADPlugin
         [CommandMethod("MoveRotateLine")]
         public void cmdRotateLine()
         {
-            var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
             var ed = doc.Editor;
             var db = doc.Database;
 

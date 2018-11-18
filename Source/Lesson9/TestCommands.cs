@@ -1,16 +1,10 @@
-﻿using System.Reflection;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using System.Collections.Generic;
-using System;
-using System.IO;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using System.Drawing;
-using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
-using System.Windows.Forms;
+using Autodesk.AutoCAD.Runtime;
 using OfficeOpenXml;
+using System.IO;
+using System.Windows.Forms;
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 [assembly: CommandClass(typeof(ACADPlugin.TestCmd))]
 

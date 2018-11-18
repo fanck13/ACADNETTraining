@@ -1,13 +1,6 @@
-﻿using System.Reflection;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using System.Collections.Generic;
+﻿using Autodesk.AutoCAD.Runtime;
 using System;
-using System.Linq;
-using Autodesk.AutoCAD.Geometry;
-using System.Drawing;
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 [assembly: CommandClass(typeof(ACADPlugin.TestCmd))]
 
@@ -19,21 +12,21 @@ namespace ACADPlugin
         public void cmdShowModelDialog()
         {
             var frm = new FormModal();
-            Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(frm);
+            AcApp.ShowModalDialog(frm);
         }
 
         [CommandMethod("ShowInteractionModelDialog")]
         public void cmdShowInteractionModelDialog()
         {
             var frm = new FormModalInteration(); 
-            Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(frm);
+            AcApp.ShowModalDialog(frm);
         }
         
         [CommandMethod("ShowModelessDialog")]
         public void cmdShowModelessDialog()
         {
             var frm = new FormModaless();
-            Autodesk.AutoCAD.ApplicationServices.Application.ShowModelessDialog(frm);
+            AcApp.ShowModelessDialog(frm);
         }
 
         private static Autodesk.AutoCAD.Windows.PaletteSet s_ps = null;
