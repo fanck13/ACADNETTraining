@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson6", "Source\Lesson6\L
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson9", "Source\Lesson9\Lesson9.csproj", "{DED33C77-986D-4C6A-B3CB-EB1177A05AFD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson8", "Source\Lesson8\Lesson8.csproj", "{A3AA70EC-5CFC-4C85-94C2-BE96434C170B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -55,6 +57,10 @@ Global
 		{DED33C77-986D-4C6A-B3CB-EB1177A05AFD}.Debug|x64.Build.0 = Debug|x64
 		{DED33C77-986D-4C6A-B3CB-EB1177A05AFD}.Release|x64.ActiveCfg = Release|x64
 		{DED33C77-986D-4C6A-B3CB-EB1177A05AFD}.Release|x64.Build.0 = Release|x64
+		{A3AA70EC-5CFC-4C85-94C2-BE96434C170B}.Debug|x64.ActiveCfg = Debug|x64
+		{A3AA70EC-5CFC-4C85-94C2-BE96434C170B}.Debug|x64.Build.0 = Debug|x64
+		{A3AA70EC-5CFC-4C85-94C2-BE96434C170B}.Release|x64.ActiveCfg = Release|x64
+		{A3AA70EC-5CFC-4C85-94C2-BE96434C170B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
