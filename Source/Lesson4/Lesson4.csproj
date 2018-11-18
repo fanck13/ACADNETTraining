@@ -6,11 +6,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{EEA13057-D6D5-4423-9F79-27AAF1137C69}</ProjectGuid>
+    <ProjectGuid>{74017ED9-874C-4DBD-892B-ECA10F435526}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ACADPlugin</RootNamespace>
-    <AssemblyName>Lesson2</AssemblyName>
+    <AssemblyName>Lesson4</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

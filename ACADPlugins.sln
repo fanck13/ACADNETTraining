@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson6", "Source\Lesson6\L
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson5", "Source\Lesson5\Lesson5.csproj", "{C8D52287-0B77-4E52-A84A-37E25E03C834}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson4", "Source\Lesson4\Lesson4.csproj", "{74017ED9-874C-4DBD-892B-ECA10F435526}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -37,6 +39,10 @@ Global
 		{C8D52287-0B77-4E52-A84A-37E25E03C834}.Debug|x64.Build.0 = Debug|x64
 		{C8D52287-0B77-4E52-A84A-37E25E03C834}.Release|x64.ActiveCfg = Release|x64
 		{C8D52287-0B77-4E52-A84A-37E25E03C834}.Release|x64.Build.0 = Release|x64
+		{74017ED9-874C-4DBD-892B-ECA10F435526}.Debug|x64.ActiveCfg = Debug|x64
+		{74017ED9-874C-4DBD-892B-ECA10F435526}.Debug|x64.Build.0 = Debug|x64
+		{74017ED9-874C-4DBD-892B-ECA10F435526}.Release|x64.ActiveCfg = Release|x64
+		{74017ED9-874C-4DBD-892B-ECA10F435526}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

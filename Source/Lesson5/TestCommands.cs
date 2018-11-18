@@ -1,13 +1,7 @@
-﻿using System.Reflection;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using System.Collections.Generic;
+using Autodesk.AutoCAD.Runtime;
 using System;
-using System.Linq;
-using Autodesk.AutoCAD.Geometry;
-using System.Drawing;
 
 [assembly: CommandClass(typeof(ACADPlugin.TestCmd))]
 
