@@ -4,5 +4,6 @@
     <SolutionRoot>..\</SolutionRoot>
 	<OutputPath>$(SolutionRoot)\..\BuildDir\$(Configuration)\$(Platform)\</OutputPath>
 	<NETFrameworkVersion>v4.5</NETFrameworkVersion>
+    <AssemblyName>$(ProjectName)</AssemblyName>
   </PropertyGroup>
 </Project>
