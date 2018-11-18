@@ -71,6 +71,45 @@ namespace ACADPlugin
                 tr.Commit();
             }
         }
+
+        [CommandMethod("AddDataTableData")]
+        public void cmdAddDataTableData()
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var ed = doc.Editor;
+            var db = doc.Database;
+
+            var result = ed.GetEntity("\nPlease select an entity to store data");
+            if (result.Status != PromptStatus.OK) return;
+
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var entity = tr.GetObject(result.ObjectId, OpenMode.ForWrite) as Entity;
+                if (entity.ExtensionDictionary.IsNull)
+                {
+                    entity.CreateExtensionDictionary();
+                }
+                var extDictId = entity.ExtensionDictionary;
+                var extDict = tr.GetObject(extDictId, OpenMode.ForWrite) as DBDictionary; 
+
+                var dataTable = new DataTable();
+                dataTable.AppendColumn(CellType.Integer, "IntValue");
+                dataTable.AppendColumn(CellType.CharPtr, "Text");
+                var rowData = new DataCellCollection();
+                var intValue = new DataCell();
+                intValue.SetInteger(123);
+                rowData.Add(intValue);
+                var textValue = new DataCell();
+                textValue.SetString("this is a text");
+                rowData.Add(textValue);
+                dataTable.AppendRow(rowData, true);
+
+                extDict["MyData"] = dataTable;
+                tr.AddNewlyCreatedDBObject(dataTable, true);
+
+                tr.Commit();
+            }
+        }
     }
 }
 
