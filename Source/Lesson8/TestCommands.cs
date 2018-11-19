@@ -2,7 +2,9 @@
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using Autodesk.AutoCAD.BoundaryRepresentation;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
+using System;
 
 [assembly: CommandClass(typeof(ACADPlugin.TestCmd))]
 
@@ -60,6 +62,37 @@ namespace ACADPlugin
                 FullSubentityPath regionPath = new FullSubentityPath(new ObjectId[] { sObj.ObjectId }, regionSubId);
                 solid3d.Highlight(regionPath, false);
                 solid3d.SetSubentityColor(regionSubId, Autodesk.AutoCAD.Colors.Color.FromRgb(255, 0, 0));
+                tr.Commit();
+            }
+        }
+
+        [CommandMethod("GetSubEntities")]
+        public void cmdGetSubEntities()
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var ed = doc.Editor;
+            var db = doc.Database;
+
+            var result = ed.GetEntity("\nPlease select a Box");
+            if (result.Status != PromptStatus.OK) return;
+
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var solid3d = tr.GetObject(result.ObjectId, OpenMode.ForWrite) as Solid3d;
+                ObjectId[] entId = new ObjectId[] { solid3d.ObjectId };
+
+                IntPtr pSubentityIdPE = solid3d.QueryX(AssocPersSubentityIdPE.GetClass(typeof(AssocPersSubentityIdPE)));
+
+                AssocPersSubentityIdPE subentityIdPE = AssocPersSubentityIdPE.Create(pSubentityIdPE, false) as AssocPersSubentityIdPE;
+                SubentityId[] edgeIds = subentityIdPE.GetAllSubentities(solid3d, SubentityType.Edge);
+
+                foreach (SubentityId subentId in edgeIds)
+                {
+                    FullSubentityPath path = new FullSubentityPath(entId, subentId);
+                    solid3d.Highlight(path, false);
+                    solid3d.SetSubentityColor(path.SubentId, Autodesk.AutoCAD.Colors.Color.FromRgb(255, 0, 0));
+                }
+
                 tr.Commit();
             }
         }

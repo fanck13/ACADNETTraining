@@ -47,6 +47,9 @@
       <HintPath>..\..\3rdParty\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="acdbmgdbrep">
+      <HintPath>..\..\3rdParty\acdbmgdbrep.dll</HintPath>
+    </Reference>
     <Reference Include="acmgd">
       <HintPath>..\..\3rdParty\acmgd.dll</HintPath>
       <Private>False</Private>
