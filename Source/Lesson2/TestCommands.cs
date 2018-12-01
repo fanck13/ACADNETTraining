@@ -51,6 +51,53 @@ namespace ACADPlugin
                 //layoutDict.Cast<DBDictionaryEntry>().ToList().ForEach(i => ed.WriteMessage(string.Format("\nLayout name : {0}", (tr.GetObject(i.Value, OpenMode.ForRead)).GetRXClass().Name)));
             } 
         }
+
+        [CommandMethod("GetBlocks")]
+        public void cmdGetBlocks()
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var ed = doc.Editor;
+            var db = doc.Database; 
+
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+                foreach (ObjectId id in bt)
+                {
+                    var btr = tr.GetObject(id, OpenMode.ForRead) as BlockTableRecord;
+                    if (id != SymbolUtilityServices.GetBlockModelSpaceId(db)        //Block must have a Name
+                        && !SymbolUtilityServices.IsBlockLayoutName(btr.Name))
+                    {
+                        ed.WriteMessage(string.Format("\nBlock : {0}", btr.Name));
+                    }
+                }
+            }
+        }
+
+        [CommandMethod("GetBlockReferences")]
+        public void cmdGetBlockReferences()
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var ed = doc.Editor;
+            var db = doc.Database;
+
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                var btr = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                foreach (ObjectId id in btr)
+                {
+                    if (id.ObjectClass.IsDerivedFrom(RXClass.GetClass(typeof(BlockReference))))
+                    {
+                        var br = tr.GetObject(id, OpenMode.ForRead) as BlockReference;
+                        var block = tr.GetObject(br.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
+                        ed.WriteMessage(string.Format("\nParent Block : {0}", block.Name));
+                    }
+                }
+            }
+        }
     }
 }
 
