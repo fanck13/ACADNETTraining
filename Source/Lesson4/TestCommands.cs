@@ -100,6 +100,34 @@ namespace ACADPlugin
                 tr.Commit();
             }
         }
+
+        [CommandMethod("CreateTable")]
+        public void cmdCreateTable()
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var ed = doc.Editor;
+            var db = doc.Database;
+
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var table = new Table();
+                table.NumColumns = 2;
+                table.NumRows = 3;
+
+                for (int i = 0; i < 3; i++)
+                {
+                    table.SetTextString(i, 0, i.ToString());
+                    table.SetTextString(i, 1, i.ToString());
+                }
+
+                var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                var btr = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+                btr.AppendEntity(table);
+                tr.AddNewlyCreatedDBObject(table, true);
+
+                tr.Commit();
+            }
+        }
     }
 }
 
