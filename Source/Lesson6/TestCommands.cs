@@ -58,7 +58,8 @@ namespace ACADPlugin
                 var extDictId = entity.ExtensionDictionary;
                 var extDict = tr.GetObject(extDictId, OpenMode.ForWrite) as DBDictionary;
                 var xrecord = new Xrecord();
-                xrecord.Data = new ResultBuffer(new TypedValue((int)DxfCode.Int16, result2.Value));                
+                xrecord.Data = new ResultBuffer(new TypedValue((int)DxfCode.Int16, result2.Value));
+                
                 extDict.SetAt("MyData", xrecord);
                 tr.AddNewlyCreatedDBObject(xrecord, true);
 
