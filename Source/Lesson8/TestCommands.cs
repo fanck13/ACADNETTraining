@@ -5,6 +5,7 @@ using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.BoundaryRepresentation;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using System;
+using System.Linq;
 
 [assembly: CommandClass(typeof(ACADPlugin.TestCmd))]
 
@@ -79,18 +80,16 @@ namespace ACADPlugin
             using (var tr = db.TransactionManager.StartTransaction())
             {
                 var solid3d = tr.GetObject(result.ObjectId, OpenMode.ForWrite) as Solid3d;
-                ObjectId[] entId = new ObjectId[] { solid3d.ObjectId };
-
-                IntPtr pSubentityIdPE = solid3d.QueryX(AssocPersSubentityIdPE.GetClass(typeof(AssocPersSubentityIdPE)));
-
-                AssocPersSubentityIdPE subentityIdPE = AssocPersSubentityIdPE.Create(pSubentityIdPE, false) as AssocPersSubentityIdPE;
-                SubentityId[] edgeIds = subentityIdPE.GetAllSubentities(solid3d, SubentityType.Edge);
-
-                foreach (SubentityId subentId in edgeIds)
+                FullSubentityPath entityPath = new FullSubentityPath(new ObjectId[] { solid3d.ObjectId }, 
+                                                                     new SubentityId(SubentityType.Null, IntPtr.Zero));
+                using (Brep brep = new Brep(entityPath))
                 {
-                    FullSubentityPath path = new FullSubentityPath(entId, subentId);
-                    solid3d.Highlight(path, false);
-                    solid3d.SetSubentityColor(path.SubentId, Autodesk.AutoCAD.Colors.Color.FromRgb(255, 0, 0));
+                    var edgePaths = brep.Edges.Select(i => i.SubentityPath).ToList();
+                    foreach (FullSubentityPath path in edgePaths)
+                    {
+                        solid3d.Highlight(path, false);
+                        solid3d.SetSubentityColor(path.SubentId, Autodesk.AutoCAD.Colors.Color.FromRgb(255, 0, 0));
+                    }
                 }
 
                 tr.Commit();
