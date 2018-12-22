@@ -3,8 +3,12 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using OfficeOpenXml;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using System.Reflection;
+using System.Collections.Generic;
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
+using System;
 
 [assembly: CommandClass(typeof(ACADPlugin.TestCmd))]
 
@@ -47,6 +51,131 @@ namespace ACADPlugin
             }
 
             db.SaveAs(Path.Combine(folderPath, @"Generated.dwg"), DwgVersion.Current);
+        }
+
+        public static List<ObjectId> GetBlockIds(Database db)
+        {
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                var names = bt.Cast<ObjectId>()
+                         .Where(i => !SymbolUtilityServices.IsBlockLayoutName((tr.GetObject(i, OpenMode.ForRead) as BlockTableRecord).Name)
+                                     && i != SymbolUtilityServices.GetBlockModelSpaceId(db))
+                         .ToList()
+                         .Select(i => (tr.GetObject(i, OpenMode.ForRead) as BlockTableRecord).Name).ToList();
+
+                return bt.Cast<ObjectId>()
+                         .Where(i => !SymbolUtilityServices.IsBlockLayoutName((tr.GetObject(i, OpenMode.ForRead) as BlockTableRecord).Name) 
+                                     && i != SymbolUtilityServices.GetBlockModelSpaceId(db))
+                         .ToList();
+            }
+        }
+
+        private static void ImportBlocksFromExternalDrawing(Database db, string externalDwgPath)
+        {
+            var srcDb = new Database();
+            srcDb.ReadDwgFile(externalDwgPath, FileOpenMode.OpenForReadAndReadShare, false, "");
+            var blockIds = GetBlockIds(srcDb);
+
+            var blockIdCol = new ObjectIdCollection();
+            blockIds.ForEach(i => blockIdCol.Add(i));
+
+            var idMapping = new IdMapping();
+            db.WblockCloneObjects(blockIdCol, db.BlockTableId, idMapping, DuplicateRecordCloning.Ignore, false);
+        }
+
+        private static void CreateBlockReference(Transaction tr, BlockTableRecord ms, ObjectId blockId, Point3d insertPt)
+        {
+            var br = new BlockReference(insertPt, blockId);
+            var id = ms.AppendEntity(br);
+            tr.AddNewlyCreatedDBObject(br, true);
+        }
+
+        [CommandMethod("AssemblyFromBlocks")]
+        public void cmdAssemblyFromBlocks()
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var ed = doc.Editor;
+            var db = doc.Database;
+
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.Filter = "All files (*.*)|*.*|DWG files (*.dwg)|*.dwg";
+            openFileDialog.FilterIndex = 2;
+            if (openFileDialog.ShowDialog() != true) return;
+            var filePath = openFileDialog.FileName;
+
+            ImportBlocksFromExternalDrawing(db, filePath);
+
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                var ms = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+                var blockVLId = bt["vl"];
+                var blockVSId = bt["vs"];
+                var blockHLId = bt["hl"];
+                var blockHSId = bt["hs"];
+
+                CreateBlockReference(tr, ms, blockVLId, new Point3d(0, 0, 0));
+                CreateBlockReference(tr, ms, blockVLId, new Point3d(300, 0, 0));
+                CreateBlockReference(tr, ms, blockVSId, new Point3d(700, 0, 0));
+                CreateBlockReference(tr, ms, blockVLId, new Point3d(0, 1600, 0));
+                CreateBlockReference(tr, ms, blockVLId, new Point3d(300, 1600, 0));
+                CreateBlockReference(tr, ms, blockVSId, new Point3d(700, 1600, 0));
+
+                var level1Height = 100;
+                var level2Height = 785;
+
+                {
+                    var hs = new BlockReference(new Point3d(0, 0, level1Height), blockHSId);
+                    hs.TransformBy(Matrix3d.Rotation(90.0 / 180.0 * Math.PI, Vector3d.YAxis, new Point3d(0, 0, level1Height)));
+                    var hs2 = hs.Clone() as BlockReference;
+                    hs2.TransformBy(Matrix3d.Displacement(new Vector3d(0, 1600, 0)));
+                    var hs3 = hs.Clone() as BlockReference;
+                    hs3.TransformBy(Matrix3d.Displacement(new Vector3d(0, 0, level2Height - level1Height)));
+                    var hs4 = hs2.Clone() as BlockReference;
+                    hs4.TransformBy(Matrix3d.Displacement(new Vector3d(0, 0, level2Height - level1Height)));
+
+                    ms.AppendEntity(hs);
+                    tr.AddNewlyCreatedDBObject(hs, true);
+                    ms.AppendEntity(hs2);
+                    tr.AddNewlyCreatedDBObject(hs2, true);
+                    ms.AppendEntity(hs3);
+                    tr.AddNewlyCreatedDBObject(hs3, true);
+                    ms.AppendEntity(hs4);
+                    tr.AddNewlyCreatedDBObject(hs4, true);
+                }
+
+                {
+                    var hl = new BlockReference(new Point3d(0,0, level1Height), blockHLId);
+                    hl.TransformBy(Matrix3d.Rotation(-90.0 / 180.0 * Math.PI, Vector3d.XAxis, new Point3d(0,0, level1Height)));
+                    var hl2 = hl.Clone() as BlockReference;
+                    hl2.TransformBy(Matrix3d.Displacement(new Vector3d(300, 0, 0)));
+                    var hl3 = hl.Clone() as BlockReference;
+                    hl3.TransformBy(Matrix3d.Displacement(new Vector3d(700, 0, 0)));    
+                    var hl4 = hl.Clone() as BlockReference;
+                    hl4.TransformBy(Matrix3d.Displacement(new Vector3d(0, 0, level2Height - level1Height)));
+                    var hl5 = hl2.Clone() as BlockReference;
+                    hl5.TransformBy(Matrix3d.Displacement(new Vector3d(0, 0, level2Height - level1Height)));
+                    var hl6 = hl3.Clone() as BlockReference;
+                    hl6.TransformBy(Matrix3d.Displacement(new Vector3d(0, 0, level2Height - level1Height)));
+
+                    ms.AppendEntity(hl);
+                    tr.AddNewlyCreatedDBObject(hl, true);
+                    ms.AppendEntity(hl2);
+                    tr.AddNewlyCreatedDBObject(hl2, true);
+                    ms.AppendEntity(hl3);
+                    tr.AddNewlyCreatedDBObject(hl3, true);
+                    ms.AppendEntity(hl4);
+                    tr.AddNewlyCreatedDBObject(hl4, true);
+                    ms.AppendEntity(hl5);
+                    tr.AddNewlyCreatedDBObject(hl5, true);
+                    ms.AppendEntity(hl6);
+                    tr.AddNewlyCreatedDBObject(hl6, true);
+                }
+
+
+                tr.Commit();
+            }
         }
     }
 }
