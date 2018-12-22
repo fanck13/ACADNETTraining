@@ -11,6 +11,38 @@ namespace ACADPlugin
 {
     public class TestCmd
     {
+
+        [CommandMethod("CreateDimension")]
+        public void cmdCreateDimension()
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var ed = doc.Editor;
+            var db = doc.Database;
+
+            var result = ed.GetPoint("Please select a point");
+            if (result.Status != PromptStatus.OK) return;
+            var ptStart = result.Value;
+
+            var result2 = ed.GetPoint("Please select a point");
+            if (result2.Status != PromptStatus.OK) return;
+            var ptEnd = result2.Value;
+
+            var result3 = ed.GetPoint("Please select a point");
+            if (result3.Status != PromptStatus.OK) return;
+            var ptCenter = result3.Value;
+
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                var ms = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+                var dim = new AlignedDimension(ptStart, ptEnd, ptCenter, "This is a sample", ObjectId.Null);
+                ms.AppendEntity(dim);
+                tr.AddNewlyCreatedDBObject(dim, true);
+
+                tr.Commit();
+            }
+        }
+
         [CommandMethod("CreateCircle")]
         public void cmdCreateCircle()
         {
@@ -127,6 +159,20 @@ namespace ACADPlugin
 
                 tr.Commit();
             }
+        }
+
+        [CommandMethod("UserPropmpt")]
+        public void cmdUserPrompt()
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var ed = doc.Editor;
+            var db = doc.Database;
+
+            ed.GetAngle("\nAngle");
+            ed.GetCorner("\nCornor", new Point3d(0, 0, 0));
+            ed.GetDistance("\nDistance");
+            ed.GetString("");
+            ed.GetInteger("");
         }
     }
 }

@@ -52,12 +52,14 @@ namespace ACADPlugin
                 var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
                 var btr = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
 
-                var ids = btr.Cast<ObjectId>().Where(i => i.ObjectClass == RXClass.GetClass(typeof(Circle)));
+                var circles = btr.Cast<ObjectId>()
+                    .Where(i => i.ObjectClass == RXClass.GetClass(typeof(Circle)))
+                    .Select(i => tr.GetObject(i, OpenMode.ForWrite) as Circle)
+                    .OrderBy(j => j.Center.X);
+                var leftCircle = circles.First();
+                leftCircle.Color = Autodesk.AutoCAD.Colors.Color.FromRgb(255, 0, 0);
 
-                if (ids.Any())
-                {
-                    ed.WriteMessage(string.Format("\nType is {0}", ids.First().ObjectClass.Name));
-                }
+                tr.Commit();
             }           
         }
     }

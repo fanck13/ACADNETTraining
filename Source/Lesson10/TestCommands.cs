@@ -26,6 +26,7 @@ namespace ACADPlugin
             var lines = File.ReadAllLines(filePath);
             using (var tr = db.TransactionManager.StartTransaction())
             {
+             
                 var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
                 var btr = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
                 foreach (var line in lines)
