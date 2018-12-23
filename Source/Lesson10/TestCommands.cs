@@ -9,11 +9,26 @@ using System.Reflection;
 using System.Collections.Generic;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 [assembly: CommandClass(typeof(ACADPlugin.TestCmd))]
 
 namespace ACADPlugin
 {
+    public class Circle
+    {
+        public int x { get; set; }
+        public int y { get; set; }
+        public int z { get; set; }
+        public int radius { get; set; }
+    }
+
+    public class RootObject
+    {
+        public List<Circle> circles { get; set; }
+    }
+
     public class TestCmd
     {
         [CommandMethod("ImportTxtForAcCoreConsole")]
@@ -173,6 +188,37 @@ namespace ACADPlugin
                     tr.AddNewlyCreatedDBObject(hl6, true);
                 }
 
+
+                tr.Commit();
+            }
+        }
+
+        [CommandMethod("ImportFromJSON")]
+        public void cmdImportFromJSON()
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var ed = doc.Editor;
+            var db = doc.Database;
+
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.Filter = "All files (*.*)|*.*|JSON files (*.json)|*.json";
+            openFileDialog.FilterIndex = 2;
+            if (openFileDialog.ShowDialog() != true) return;
+            var filePath = openFileDialog.FileName;
+
+            var jsonText = File.ReadAllText(filePath);
+            RootObject ro = JsonConvert.DeserializeObject<RootObject>(jsonText);
+
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                var btr = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+                foreach (var c in ro.circles)
+                {
+                    var circle = new Autodesk.AutoCAD.DatabaseServices.Circle(new Point3d(c.x, c.y, c.z), Vector3d.ZAxis, c.radius);
+                    btr.AppendEntity(circle);
+                    tr.AddNewlyCreatedDBObject(circle, true);
+                }
 
                 tr.Commit();
             }
