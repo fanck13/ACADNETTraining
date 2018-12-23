@@ -1,3 +1,15 @@
-11,22,33
-22,33,11
-44,55,66
+<?xml version="1.0" encoding="utf-8" ?>
+<Circles>
+  <Circle>
+    <x>11</x>
+    <y>16</y>
+    <z>16</z>
+    <radius>16</radius>
+  </Circle>
+  <Circle>
+    <x>111</x>
+    <y>162</y>
+    <z>163</z>
+    <radius>126</radius>
+  </Circle>
+</Circles>

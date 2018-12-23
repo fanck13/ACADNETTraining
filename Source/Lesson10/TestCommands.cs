@@ -11,6 +11,8 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Xml.Serialization;
+
 
 [assembly: CommandClass(typeof(ACADPlugin.TestCmd))]
 
@@ -27,6 +29,18 @@ namespace ACADPlugin
     public class RootObject
     {
         public List<Circle> circles { get; set; }
+    }
+
+    public class Circles
+    {
+        List<Circle> circleList = new List<Circle>();
+
+        [XmlElement(ElementName = "Circle")]
+        public List<Circle> CircleList
+        {
+            get { return circleList; }
+            set { circleList = value; }
+        }
     }
 
     public class TestCmd
@@ -214,6 +228,39 @@ namespace ACADPlugin
                 var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
                 var btr = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
                 foreach (var c in ro.circles)
+                {
+                    var circle = new Autodesk.AutoCAD.DatabaseServices.Circle(new Point3d(c.x, c.y, c.z), Vector3d.ZAxis, c.radius);
+                    btr.AppendEntity(circle);
+                    tr.AddNewlyCreatedDBObject(circle, true);
+                }
+
+                tr.Commit();
+            }
+        }
+
+        [CommandMethod("ImportFromXML")]
+        public void cmdImportFromXML()
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var ed = doc.Editor;
+            var db = doc.Database;
+
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.Filter = "All files (*.*)|*.*|XML files (*.xml)|*.xml";
+            openFileDialog.FilterIndex = 2;
+            if (openFileDialog.ShowDialog() != true) return;
+            var filePath = openFileDialog.FileName;
+
+            FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            XmlSerializer xmlSearializer = new XmlSerializer(typeof(Circles));
+            Circles circles = (Circles)xmlSearializer.Deserialize(file);
+            file.Close();
+
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                var btr = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+                foreach (var c in circles.CircleList)
                 {
                     var circle = new Autodesk.AutoCAD.DatabaseServices.Circle(new Point3d(c.x, c.y, c.z), Vector3d.ZAxis, c.radius);
                     btr.AppendEntity(circle);
