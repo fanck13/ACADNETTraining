@@ -59,7 +59,7 @@ namespace ACADPlugin
             var lines = File.ReadAllLines(filePath);
             using (var tr = db.TransactionManager.StartTransaction())
             {
-             
+
                 var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
                 var btr = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
                 foreach (var line in lines)
@@ -94,7 +94,7 @@ namespace ACADPlugin
                          .Select(i => (tr.GetObject(i, OpenMode.ForRead) as BlockTableRecord).Name).ToList();
 
                 return bt.Cast<ObjectId>()
-                         .Where(i => !SymbolUtilityServices.IsBlockLayoutName((tr.GetObject(i, OpenMode.ForRead) as BlockTableRecord).Name) 
+                         .Where(i => !SymbolUtilityServices.IsBlockLayoutName((tr.GetObject(i, OpenMode.ForRead) as BlockTableRecord).Name)
                                      && i != SymbolUtilityServices.GetBlockModelSpaceId(db))
                          .ToList();
             }
@@ -175,12 +175,12 @@ namespace ACADPlugin
                 }
 
                 {
-                    var hl = new BlockReference(new Point3d(0,0, level1Height), blockHLId);
-                    hl.TransformBy(Matrix3d.Rotation(-90.0 / 180.0 * Math.PI, Vector3d.XAxis, new Point3d(0,0, level1Height)));
+                    var hl = new BlockReference(new Point3d(0, 0, level1Height), blockHLId);
+                    hl.TransformBy(Matrix3d.Rotation(-90.0 / 180.0 * Math.PI, Vector3d.XAxis, new Point3d(0, 0, level1Height)));
                     var hl2 = hl.Clone() as BlockReference;
                     hl2.TransformBy(Matrix3d.Displacement(new Vector3d(300, 0, 0)));
                     var hl3 = hl.Clone() as BlockReference;
-                    hl3.TransformBy(Matrix3d.Displacement(new Vector3d(700, 0, 0)));    
+                    hl3.TransformBy(Matrix3d.Displacement(new Vector3d(700, 0, 0)));
                     var hl4 = hl.Clone() as BlockReference;
                     hl4.TransformBy(Matrix3d.Displacement(new Vector3d(0, 0, level2Height - level1Height)));
                     var hl5 = hl2.Clone() as BlockReference;
@@ -266,6 +266,39 @@ namespace ACADPlugin
                     btr.AppendEntity(circle);
                     tr.AddNewlyCreatedDBObject(circle, true);
                 }
+
+                tr.Commit();
+            }
+        }
+
+        [CommandMethod("TestUCS")]
+        public void cmdTestUCS()
+        {
+            var doc = AcApp.DocumentManager.MdiActiveDocument;
+            var ed = doc.Editor;
+            var db = doc.Database;
+
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                var ms = tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+
+                var ucs = new CoordinateSystem3d(new Point3d(11, 22, 0), Vector3d.XAxis, Vector3d.YAxis);
+
+                //UCS到WCS的转换矩阵
+                var matrix = Matrix3d.AlignCoordinateSystem(Point3d.Origin, Vector3d.XAxis, Vector3d.YAxis, Vector3d.ZAxis,
+                                                            ucs.Origin, ucs.Xaxis, ucs.Yaxis, ucs.Zaxis);
+
+                ed.CurrentUserCoordinateSystem = matrix;
+
+                //API中加进去的都是WCS的坐标，我们构造的时候是通过UCS里的坐标值来构造的，真正加进去之前需要转换到WCS
+                var circle = new Autodesk.AutoCAD.DatabaseServices.Circle();
+                circle.Center = new Point3d(10, 10, 0);
+                circle.Radius = 5;
+                circle.TransformBy(matrix);
+
+                ms.AppendEntity(circle);
+                tr.AddNewlyCreatedDBObject(circle, true);
 
                 tr.Commit();
             }
